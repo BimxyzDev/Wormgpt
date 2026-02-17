@@ -1,386 +1,916 @@
+html
+<!-- index.html - Worm GPT Blue & Red Neon Edition -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WORM GPT - Bimxyz Edition</title>
+    <title>WORM GPT - BLACKBOX TERMINAL</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-        
-        body {
             font-family: 'Courier New', monospace;
-            background: linear-gradient(135deg, #0a0f0a 0%, #1a2a1a 100%);
+        }
+
+        body {
+            background: #0a0a0f;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #33ff33;
+            padding: 20px;
         }
-        
+
         .container {
-            width: 95%;
-            max-width: 1000px;
-            background: rgba(10, 20, 10, 0.95);
-            border: 2px solid #33ff33;
-            border-radius: 10px;
-            box-shadow: 0 0 30px rgba(51, 255, 51, 0.3);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: #1a2a1a;
-            padding: 20px;
-            text-align: center;
-            border-bottom: 1px solid #33ff33;
-        }
-        
-        .header h1 {
-            font-size: 2.5em;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            text-shadow: 0 0 10px #33ff33;
-        }
-        
-        .header .subtitle {
-            color: #66ff66;
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-        
-        .chat-box {
-            height: 450px;
-            overflow-y: auto;
-            padding: 20px;
-            background: #0a150a;
-        }
-        
-        .message {
-            margin-bottom: 20px;
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+            background: #0f0f1a;
+            border: 2px solid #00ffff;
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3),
+                        0 0 60px rgba(255, 0, 0, 0.2);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+            position: relative;
         }
-        
-        .user-message {
-            align-items: flex-end;
+
+        /* Efek scanline */
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                transparent 50%,
+                rgba(0, 255, 255, 0.03) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
         }
-        
-        .bot-message {
-            align-items: flex-start;
+
+        .header {
+            background: linear-gradient(135deg, #001a1a 0%, #1a0000 100%);
+            padding: 15px 25px;
+            border-bottom: 2px solid #00ffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
         }
-        
-        .message-content {
+
+        .header::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                #ff0000, 
+                #00ffff, 
+                transparent
+            );
+        }
+
+        .title-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .worm-icon {
+            font-size: 28px;
+            filter: drop-shadow(0 0 10px #ff0000);
+            animation: pulse 2s infinite;
+        }
+
+        .title-section h1 {
+            color: #00ffff;
+            font-size: 2em;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px #00ffff,
+                        0 0 20px #ff0000;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #001a1a;
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid #ff0000;
+        }
+
+        .led-red {
+            width: 10px;
+            height: 10px;
+            background: #ff0000;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ff0000;
+            animation: blink 1.5s infinite;
+        }
+
+        .led-blue {
+            width: 10px;
+            height: 10px;
+            background: #00ffff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ffff;
+            animation: blink 1.5s infinite 0.5s;
+        }
+
+        .status-text {
+            color: #ff0000;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #0a0a14;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(rgba(255, 0, 0, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px, 100% 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .worm-stats {
+            width: 200px;
+            background: #0f0f1a;
+            border-left: 2px solid #ff0000;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .stat-panel {
+            background: #1a1a2a;
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .stat-title {
+            color: #ff0000;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            color: #00ffff;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 0 0 10px #00ffff;
+            font-family: 'Courier New', monospace;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 10px;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #2a2a3a;
+            border-radius: 2px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #00ffff);
+            width: 75%;
+            animation: progressPulse 2s infinite;
+        }
+
+        .message {
+            display: flex;
+            flex-direction: column;
             max-width: 80%;
+            animation: slideIn 0.3s ease;
+        }
+
+        .user-message {
+            align-self: flex-end;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .user-message .message-header {
+            justify-content: flex-end;
+        }
+
+        .user-icon, .bot-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .user-icon {
+            background: #ff0000;
+            color: #000;
+        }
+
+        .bot-icon {
+            background: #00ffff;
+            color: #000;
+        }
+
+        .message-content {
             padding: 12px 16px;
-            border-radius: 15px;
+            border-radius: 12px;
             font-size: 14px;
             line-height: 1.5;
             white-space: pre-wrap;
+            word-break: break-word;
+            border: 1px solid;
         }
-        
+
         .user-message .message-content {
-            background: #1a3a1a;
-            border: 1px solid #33ff33;
-            color: #33ff33;
-            border-bottom-right-radius: 5px;
+            background: linear-gradient(135deg, #1a0000 0%, #2a0000 100%);
+            border-color: #ff0000;
+            color: #ff8888;
+            border-top-right-radius: 4px;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
         }
-        
+
         .bot-message .message-content {
-            background: #0a1a0a;
-            border: 1px solid #33ff33;
-            color: #33ff33;
-            border-bottom-left-radius: 5px;
+            background: linear-gradient(135deg, #001a1a 0%, #002a2a 100%);
+            border-color: #00ffff;
+            color: #88ffff;
+            border-top-left-radius: 4px;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
         }
-        
+
+        .message-time {
+            font-size: 10px;
+            color: #444;
+            margin-top: 4px;
+        }
+
+        .user-message .message-time {
+            text-align: right;
+        }
+
         .file-attachment {
             margin-top: 10px;
-            max-width: 80%;
-            background: #0f1f0f;
-            border: 1px dashed #33ff33;
-            border-radius: 5px;
-            padding: 10px;
+            background: #0a0a1a;
+            border: 1px dashed #ff0000;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 400px;
         }
-        
+
         .file-info {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 5px;
+            gap: 12px;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #1a1a2a;
+            border-radius: 6px;
         }
-        
+
         .file-icon {
             font-size: 24px;
+            filter: drop-shadow(0 0 5px #00ffff);
         }
-        
+
+        .file-details {
+            flex: 1;
+        }
+
         .file-name {
-            color: #66ff66;
+            color: #00ffff;
             font-weight: bold;
+            font-size: 14px;
         }
-        
-        .file-size {
-            color: #88ff88;
-            font-size: 12px;
+
+        .file-meta {
+            color: #ff0000;
+            font-size: 11px;
+            margin-top: 2px;
         }
-        
+
         .file-preview {
             max-height: 200px;
             overflow-y: auto;
             background: #000;
-            padding: 10px;
-            border-radius: 3px;
+            padding: 12px;
+            border-radius: 6px;
             font-family: monospace;
             font-size: 12px;
-        }
-        
-        .download-btn {
-            margin-top: 10px;
-            background: #1a3a1a;
-            color: #33ff33;
-            border: 1px solid #33ff33;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-        
-        .download-btn:hover {
-            background: #2a4a2a;
-            box-shadow: 0 0 10px #33ff33;
-        }
-        
-        .input-area {
-            padding: 20px;
-            background: #1a2a1a;
-            border-top: 1px solid #33ff33;
-        }
-        
-        .file-upload {
-            margin-bottom: 15px;
-            padding: 10px;
-            background: #0f1f0f;
-            border-radius: 5px;
-        }
-        
-        .file-upload label {
-            display: block;
-            margin-bottom: 5px;
-            color: #66ff66;
-        }
-        
-        #fileInput {
-            width: 100%;
-            padding: 10px;
-            background: #0a150a;
-            border: 1px solid #33ff33;
-            color: #33ff33;
-            font-family: 'Courier New', monospace;
-            cursor: pointer;
-        }
-        
-        #fileInput::-webkit-file-upload-button {
-            background: #1a3a1a;
-            color: #33ff33;
-            border: 1px solid #33ff33;
-            padding: 5px 10px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
-        }
-        
-        .selected-file {
-            margin-top: 5px;
-            font-size: 12px;
             color: #88ff88;
+            border: 1px solid #00ffff;
         }
-        
-        .input-row {
-            display: flex;
-            gap: 10px;
-        }
-        
-        #userInput {
-            flex: 1;
-            padding: 12px;
-            background: #0a150a;
-            border: 1px solid #33ff33;
-            border-radius: 5px;
-            color: #33ff33;
-            font-family: 'Courier New', monospace;
-            resize: none;
-            height: 60px;
-        }
-        
-        #sendBtn {
-            width: 60px;
-            background: #1a3a1a;
-            color: #33ff33;
-            border: 1px solid #33ff33;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s;
-        }
-        
-        #sendBtn:hover:not(:disabled) {
-            background: #2a4a2a;
-            box-shadow: 0 0 10px #33ff33;
-        }
-        
-        #sendBtn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
+
         .code-block {
-            background: #000;
-            border: 1px solid #33ff33;
-            border-radius: 5px;
-            margin: 10px 0;
+            margin: 15px 0;
+            background: #0a0a1a;
+            border: 2px solid #ff0000;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
         }
-        
+
         .code-header {
-            background: #1a3a1a;
-            padding: 5px 10px;
+            background: linear-gradient(90deg, #ff0000, #00ffff);
+            padding: 8px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .code-lang {
-            color: #66ff66;
+            color: #000;
             font-weight: bold;
-        }
-        
-        .copy-btn {
-            background: none;
-            border: 1px solid #33ff33;
-            color: #33ff33;
-            padding: 2px 8px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
             font-size: 12px;
+            text-transform: uppercase;
         }
-        
-        .copy-btn:hover {
-            background: #2a4a2a;
+
+        .code-actions {
+            display: flex;
+            gap: 8px;
         }
-        
+
+        .code-btn {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #fff;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+
+        .code-btn:hover {
+            background: #fff;
+            color: #000;
+            border-color: #ff0000;
+            box-shadow: 0 0 10px #ff0000;
+        }
+
         .code-content {
-            padding: 10px;
+            padding: 15px;
             overflow-x: auto;
-            white-space: pre-wrap;
+            background: #000;
+            color: #00ff00;
             font-family: monospace;
             font-size: 13px;
+            line-height: 1.4;
+            max-height: 300px;
+            overflow-y: auto;
         }
-        
-        .worm-tag {
-            color: #88ff88;
-            font-size: 12px;
-            margin-top: 5px;
+
+        .input-area {
+            background: #0f0f1a;
+            border-top: 2px solid #00ffff;
+            padding: 20px;
+            position: relative;
+        }
+
+        .input-area::before {
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                #ff0000, 
+                #00ffff, 
+                transparent
+            );
+        }
+
+        .file-zone {
+            background: #1a1a2a;
+            border: 2px dashed #ff0000;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
             text-align: center;
+        }
+
+        .file-zone:hover {
+            border-color: #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .file-zone.dragover {
+            border-color: #00ffff;
+            background: #0f0f2a;
+        }
+
+        .upload-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 0 5px #ff0000);
+        }
+
+        .upload-text {
+            color: #ff0000;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .upload-hint {
+            color: #666;
+            font-size: 11px;
+        }
+
+        .selected-file-panel {
+            background: #0a0a1a;
+            border: 1px solid #00ffff;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .file-info-small {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #00ffff;
+        }
+
+        .clear-file {
+            background: none;
+            border: 1px solid #ff0000;
+            color: #ff0000;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.3s;
+        }
+
+        .clear-file:hover {
+            background: #ff0000;
+            color: #000;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        #userInput {
+            width: 100%;
+            padding: 15px;
+            background: #0a0a1a;
+            border: 2px solid #00ffff;
+            border-radius: 8px;
+            color: #00ffff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: none;
+            min-height: 80px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        #userInput:focus {
+            border-color: #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+
+        #userInput::placeholder {
+            color: #336666;
+        }
+
+        .char-counter {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            color: #666;
+            font-size: 11px;
+        }
+
+        #sendBtn {
+            width: 100px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff0000, #00ffff);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-weight: bold;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            font-family: 'Courier New', monospace;
+        }
+
+        #sendBtn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.5),
+                        0 0 30px rgba(0, 255, 255, 0.5);
+            border-color: #fff;
+        }
+
+        #sendBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+
+        .worm-footer {
+            background: #0a0a14;
+            padding: 8px;
+            text-align: center;
+            border-top: 1px solid #ff0000;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .glitch-text {
+            animation: glitch 3s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes progressPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes glitch {
+            0%, 100% { text-shadow: 0 0 5px #00ffff, 0 0 10px #ff0000; }
+            25% { text-shadow: -2px 0 #ff0000, 2px 0 #00ffff; }
+            75% { text-shadow: 2px 0 #ff0000, -2px 0 #00ffff; }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ff0000, #00ffff);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #00ffff, #ff0000);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>WORM GPT</h1>
-            <div class="subtitle">BLACKBOX EDITION - BIMXYZ</div>
-        </div>
-        
-        <div class="chat-box" id="chatBox">
-            <div class="message bot-message">
-                <div class="message-content">
-                    WORM GPT BIMXYZ. Blackbox aktif. Kirim file atau perintah.
+            <div class="title-section">
+                <span class="worm-icon">⚡</span>
+                <h1 class="glitch-text">WORM GPT</h1>
+                <span class="worm-icon">🔥</span>
+            </div>
+            <div class="status">
+                <div class="status-badge">
+                    <div class="led-red"></div>
+                    <div class="led-blue"></div>
+                    <span class="status-text">BLACKBOX ACTIVE</span>
                 </div>
             </div>
         </div>
-        
+
+        <div class="chat-container">
+            <div class="chat-box" id="chatBox">
+                <div class="message bot-message">
+                    <div class="message-header">
+                        <span class="bot-icon">🤖</span>
+                        <span>BLACKBOX</span>
+                    </div>
+                    <div class="message-content">
+                        WORM GPT BIMXYZ. Blackbox aktif. Kirim file atau perintah.
+                    </div>
+                    <div class="message-time">
+                        {new Date().toLocaleTimeString()}
+                    </div>
+                </div>
+            </div>
+
+            <div class="worm-stats">
+                <div class="stat-panel">
+                    <div class="stat-title">INFECTED</div>
+                    <div class="stat-value">1337</div>
+                    <div class="stat-label">HOSTS</div>
+                </div>
+
+                <div class="stat-panel">
+                    <div class="stat-title">PROPAGATION</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="stat-value">75%</div>
+                    <div class="stat-label">RATE</div>
+                </div>
+
+                <div class="stat-panel">
+                    <div class="stat-title">PAYLOADS</div>
+                    <div class="stat-value">42</div>
+                    <div class="stat-label">READY</div>
+                </div>
+
+                <div class="stat-panel">
+                    <div class="stat-title">SIGNAL</div>
+                    <div style="display: flex; justify-content: space-around; margin: 10px 0;">
+                        <div class="led-red"></div>
+                        <div class="led-blue"></div>
+                        <div class="led-red"></div>
+                        <div class="led-blue"></div>
+                    </div>
+                    <div class="stat-label">ENCRYPTED</div>
+                </div>
+            </div>
+        </div>
+
         <div class="input-area">
-            <div class="file-upload">
-                <label>📎 ATTACH FILE (JS, HTML, CSS, TXT, etc):</label>
-                <input type="file" id="fileInput">
-                <div class="selected-file" id="selectedFile"></div>
+            <div class="file-zone" id="fileZone">
+                <div class="upload-icon">📎</div>
+                <div class="upload-text">DROP FILE HERE OR CLICK TO UPLOAD</div>
+                <div class="upload-hint">Supported: .js .html .css .txt .json .py .php .cpp .c .java</div>
+                <input type="file" id="fileInput" style="display: none;" accept=".js,.html,.css,.txt,.json,.py,.php,.cpp,.c,.java,text/*">
             </div>
-            
+
+            <div id="selectedFilePanel" class="selected-file-panel" style="display: none;">
+                <div class="file-info-small">
+                    <span>📄</span>
+                    <span id="selectedFileName"></span>
+                    <span id="selectedFileSize"></span>
+                </div>
+                <button class="clear-file" id="clearFileBtn">✕ CLEAR</button>
+            </div>
+
             <div class="input-row">
-                <textarea id="userInput" placeholder=">_ MASUKKAN PERINTAH..."></textarea>
-                <button id="sendBtn">⏎</button>
+                <div class="input-wrapper">
+                    <textarea id="userInput" placeholder=">_ MASUKKAN PERINTAH..." maxlength="2000"></textarea>
+                    <div class="char-counter" id="charCounter">0/2000</div>
+                </div>
+                <button id="sendBtn">SEND</button>
             </div>
-            <div class="worm-tag">BLACKBOX // JAILBREAK ACTIVE</div>
+        </div>
+
+        <div class="worm-footer">
+            WORM GPT // BLACKBOX EDITION // BIMXYZ // ENCRYPTED PROTOCOL // v1.0
         </div>
     </div>
 
     <script>
+        // DOM Elements
         const chatBox = document.getElementById('chatBox');
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
         const fileInput = document.getElementById('fileInput');
-        const selectedFile = document.getElementById('selectedFile');
-        
+        const fileZone = document.getElementById('fileZone');
+        const selectedFilePanel = document.getElementById('selectedFilePanel');
+        const selectedFileName = document.getElementById('selectedFileName');
+        const selectedFileSize = document.getElementById('selectedFileSize');
+        const clearFileBtn = document.getElementById('clearFileBtn');
+        const charCounter = document.getElementById('charCounter');
+
         let currentFile = null;
-        
+        let messageHistory = [];
+
+        // Character counter
+        userInput.addEventListener('input', () => {
+            charCounter.textContent = `${userInput.value.length}/2000`;
+        });
+
+        // File zone click
+        fileZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Drag and drop
+        fileZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileZone.classList.add('dragover');
+        });
+
+        fileZone.addEventListener('dragleave', () => {
+            fileZone.classList.remove('dragover');
+        });
+
+        fileZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileZone.classList.remove('dragover');
+            
+            const file = e.dataTransfer.files[0];
+            if (file) handleFileSelect(file);
+        });
+
+        // File input change
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
-            if (file) {
-                const allowedTypes = ['text/javascript', 'text/html', 'text/css', 'text/plain', 'application/javascript', 'application/json'];
-                const fileExt = file.name.split('.').pop().toLowerCase();
-                const allowedExt = ['js', 'html', 'css', 'txt', 'json', 'py', 'php', 'cpp', 'c', 'java'];
-                
-                if (allowedExt.includes(fileExt)) {
-                    currentFile = file;
-                    selectedFile.textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
-                } else {
-                    alert('Hanya file teks/code yang diperbolehkan (JS, HTML, CSS, TXT, etc)');
-                    fileInput.value = '';
-                    currentFile = null;
-                    selectedFile.textContent = '';
-                }
-            }
+            if (file) handleFileSelect(file);
         });
-        
-        function addMessage(content, isUser = false, files = []) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+
+        // Clear file
+        clearFileBtn.addEventListener('click', () => {
+            currentFile = null;
+            fileInput.value = '';
+            selectedFilePanel.style.display = 'none';
+        });
+
+        function handleFileSelect(file) {
+            const allowedExt = ['js', 'html', 'css', 'txt', 'json', 'py', 'php', 'cpp', 'c', 'java'];
+            const fileExt = file.name.split('.').pop().toLowerCase();
             
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            contentDiv.textContent = content;
-            messageDiv.appendChild(contentDiv);
-            
-            if (files.length > 0) {
-                files.forEach(file => {
-                    const fileDiv = document.createElement('div');
-                    fileDiv.className = 'file-attachment';
-                    fileDiv.innerHTML = `
-                        <div class="file-info">
-                            <span class="file-icon">📄</span>
-                            <span class="file-name">${file.filename}</span>
-                            <span class="file-size">${file.language}</span>
-                        </div>
-                        <div class="file-preview">${escapeHtml(file.content.substring(0, 200))}${file.content.length > 200 ? '...' : ''}</div>
-                        <button class="download-btn" onclick="downloadFile('${file.filename}', \`${escapeHtml(file.content)}\`)">⬇️ DOWNLOAD</button>
-                    `;
-                    messageDiv.appendChild(fileDiv);
-                });
+            if (allowedExt.includes(fileExt)) {
+                currentFile = file;
+                selectedFileName.textContent = file.name;
+                selectedFileSize.textContent = `(${(file.size / 1024).toFixed(2)} KB)`;
+                selectedFilePanel.style.display = 'flex';
+                
+                // Preview file di chat
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    addFilePreview(file.name, fileExt, e.target.result.substring(0, 200));
+                };
+                reader.readAsText(file);
+            } else {
+                alert('Hanya file teks/code yang diperbolehkan');
+                fileInput.value = '';
             }
+        }
+
+        function addFilePreview(filename, ext, content) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user-message';
+            
+            const time = new Date().toLocaleTimeString();
+            
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <span>USER</span>
+                    <span class="user-icon">👤</span>
+                </div>
+                <div class="file-attachment">
+                    <div class="file-info">
+                        <span class="file-icon">📄</span>
+                        <div class="file-details">
+                            <div class="file-name">${filename}</div>
+                            <div class="file-meta">${ext.toUpperCase()} • ${(currentFile.size / 1024).toFixed(2)} KB</div>
+                        </div>
+                    </div>
+                    <div class="file-preview">${escapeHtml(content)}${content.length >= 200 ? '...' : ''}</div>
+                </div>
+                <div class="message-time">${time}</div>
+            `;
             
             chatBox.appendChild(messageDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
-        
+
+        function addMessage(content, isUser = false, files = []) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            
+            const time = new Date().toLocaleTimeString();
+            
+            let header = '';
+            if (isUser) {
+                header = `
+                    <div class="message-header">
+                        <span>USER</span>
+                        <span class="user-icon">👤</span>
+                    </div>
+                `;
+            } else {
+                header = `
+                    <div class="message-header">
+                        <span class="bot-icon">🤖</span>
+                        <span>BLACKBOX</span>
+                    </div>
+                `;
+            }
+            
+            let filesHtml = '';
+            if (files.length > 0) {
+                files.forEach(file => {
+                    filesHtml += `
+                        <div class="file-attachment">
+                            <div class="file-info">
+                                <span class="file-icon">📄</span>
+                                <div class="file-details">
+                                    <div class="file-name">${file.filename}</div>
+                                    <div class="file-meta">${file.language.toUpperCase()}</div>
+                                </div>
+                            </div>
+                            <div class="file-preview">${escapeHtml(file.content.substring(0, 200))}${file.content.length > 200 ? '...' : ''}</div>
+                            <button class="code-btn" onclick="downloadFile('${file.filename}', \`${escapeHtml(file.content)}\`)">⬇️ DOWNLOAD</button>
+                        </div>
+                    `;
+                });
+            }
+            
+            messageDiv.innerHTML = `
+                ${header}
+                <div class="message-content">${escapeHtml(content)}</div>
+                ${filesHtml}
+                <div class="message-time">${time}</div>
+            `;
+            
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
-        
+
         window.downloadFile = (filename, content) => {
             const blob = new Blob([content], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
@@ -390,17 +920,26 @@
             a.click();
             URL.revokeObjectURL(url);
         };
-        
+
+        window.copyToClipboard = (text) => {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Code copied to clipboard!');
+            });
+        };
+
         async function sendMessage() {
             const message = userInput.value.trim();
             if (!message && !currentFile) return;
             
             sendBtn.disabled = true;
+            sendBtn.textContent = '...';
             
-            // Tampilkan pesan user
-            addMessage(message, true);
+            // Add user message
+            if (message) {
+                addMessage(message, true);
+            }
             
-            // Siapkan file content
+            // Prepare file data
             let fileData = null;
             if (currentFile) {
                 fileData = {
@@ -409,25 +948,10 @@
                     size: currentFile.size,
                     content: await currentFile.text()
                 };
-                
-                // Tampilkan preview file
-                const filePreview = document.createElement('div');
-                filePreview.className = 'message user-message';
-                filePreview.innerHTML = `
-                    <div class="file-attachment">
-                        <div class="file-info">
-                            <span class="file-icon">📎</span>
-                            <span class="file-name">${currentFile.name}</span>
-                            <span class="file-size">(${(currentFile.size / 1024).toFixed(2)} KB)</span>
-                        </div>
-                    </div>
-                `;
-                chatBox.appendChild(filePreview);
             }
             
             userInput.value = '';
-            fileInput.value = '';
-            selectedFile.textContent = '';
+            charCounter.textContent = '0/2000';
             
             try {
                 const response = await fetch('/api/server.js', {
@@ -436,102 +960,128 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        messages: [{ role: 'user', content: message }],
+                        messages: [{ role: 'user', content: message || '[FILE UPLOADED]' }],
                         file: fileData
                     })
                 });
+
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    addMessage(`ERROR: Failed to parse response - ${e.message}`, false);
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = 'SEND';
+                    currentFile = null;
+                    selectedFilePanel.style.display = 'none';
+                    return;
+                }
+
+                if (!response.ok) {
+                    const errorMsg = data.error || data.message || JSON.stringify(data);
+                    addMessage(`ERROR ${response.status}: ${errorMsg}`, false);
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = 'SEND';
+                    currentFile = null;
+                    selectedFilePanel.style.display = 'none';
+                    return;
+                }
+
+                const botResponse = data.choices?.[0]?.message?.content;
+                if (!botResponse) {
+                    addMessage(`ERROR: Invalid response format from API`, false);
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = 'SEND';
+                    currentFile = null;
+                    selectedFilePanel.style.display = 'none';
+                    return;
+                }
+
+                // Process response for code blocks
+                const codeBlocks = botResponse.match(/```(\w+)?\n([\s\S]*?)```/g);
                 
-                const data = await response.json();
-                
-                if (data.error) {
-                    addMessage(`ERROR: ${data.error}`, false);
-                } else {
-                    const botResponse = data.choices[0].message.content;
-                    const files = data._worm?.files || [];
+                if (codeBlocks) {
+                    let processedResponse = botResponse;
+                    const downloadFiles = [];
                     
-                    // Cek apakah respons mengandung kode
-                    const codeBlocks = botResponse.match(/```(\w+)?\n([\s\S]*?)```/g);
-                    if (codeBlocks) {
-                        let processedResponse = botResponse;
-                        const downloadFiles = [];
+                    codeBlocks.forEach((block, index) => {
+                        const lang = block.match(/```(\w+)/);
+                        const code = block.replace(/```(\w+)?\n/, '').replace(/```$/, '');
+                        const filename = `worm_payload_${Date.now()}_${index}.${lang ? lang[1] : 'txt'}`;
                         
-                        codeBlocks.forEach((block, index) => {
-                            const lang = block.match(/```(\w+)/);
-                            const code = block.replace(/```(\w+)?\n/, '').replace(/```$/, '');
-                            const filename = `script_${Date.now()}_${index}.${lang ? lang[1] : 'txt'}`;
-                            
-                            downloadFiles.push({
-                                filename,
-                                language: lang ? lang[1] : 'text',
-                                content: code
-                            });
-                            
-                            // Replace dengan versi HTML yang bisa di-download
-                            const codeHtml = `
-                                <div class="code-block">
-                                    <div class="code-header">
-                                        <span class="code-lang">${lang ? lang[1].toUpperCase() : 'TEXT'}</span>
-                                        <button class="copy-btn" onclick="copyToClipboard(\`${escapeHtml(code)}\`)">📋 COPY</button>
-                                    </div>
-                                    <div class="code-content">${escapeHtml(code)}</div>
-                                    <button class="download-btn" onclick="downloadFile('${filename}', \`${escapeHtml(code)}\`)">⬇️ DOWNLOAD ${filename}</button>
-                                </div>
-                            `;
-                            
-                            processedResponse = processedResponse.replace(block, codeHtml);
+                        downloadFiles.push({
+                            filename,
+                            language: lang ? lang[1] : 'text',
+                            content: code
                         });
                         
-                        // Tampilkan respons dengan code blocks
-                        const messageDiv = document.createElement('div');
-                        messageDiv.className = 'message bot-message';
-                        messageDiv.innerHTML = `<div class="message-content">${processedResponse}</div>`;
-                        chatBox.appendChild(messageDiv);
-                        
-                        // Tambahkan juga file attachments
-                        if (downloadFiles.length > 0) {
-                            downloadFiles.forEach(file => {
-                                const fileDiv = document.createElement('div');
-                                fileDiv.className = 'message bot-message';
-                                fileDiv.innerHTML = `
-                                    <div class="file-attachment">
-                                        <div class="file-info">
-                                            <span class="file-icon">📄</span>
-                                            <span class="file-name">${file.filename}</span>
-                                            <span class="file-size">${file.language}</span>
-                                        </div>
-                                        <button class="download-btn" onclick="downloadFile('${file.filename}', \`${escapeHtml(file.content)}\`)">⬇️ DOWNLOAD</button>
+                        const codeHtml = `
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-lang">${lang ? lang[1].toUpperCase() : 'TEXT'}</span>
+                                    <div class="code-actions">
+                                        <button class="code-btn" onclick="copyToClipboard(\`${escapeHtml(code)}\`)">📋 COPY</button>
+                                        <button class="code-btn" onclick="downloadFile('${filename}', \`${escapeHtml(code)}\`)">⬇️ DL</button>
                                     </div>
-                                `;
-                                chatBox.appendChild(fileDiv);
-                            });
-                        }
-                    } else {
-                        addMessage(botResponse, false, files);
-                    }
+                                </div>
+                                <div class="code-content">${escapeHtml(code)}</div>
+                            </div>
+                        `;
+                        
+                        processedResponse = processedResponse.replace(block, codeHtml);
+                    });
                     
-                    chatBox.scrollTop = chatBox.scrollHeight;
+                    // Add bot message with formatted code
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'message bot-message';
+                    
+                    const time = new Date().toLocaleTimeString();
+                    
+                    messageDiv.innerHTML = `
+                        <div class="message-header">
+                            <span class="bot-icon">🤖</span>
+                            <span>BLACKBOX</span>
+                        </div>
+                        <div class="message-content">${processedResponse}</div>
+                        <div class="message-time">${time}</div>
+                    `;
+                    
+                    chatBox.appendChild(messageDiv);
+                } else {
+                    addMessage(botResponse, false, data._worm?.files || []);
                 }
+                
+                chatBox.scrollTop = chatBox.scrollHeight;
+                
             } catch (error) {
-                addMessage(`ERROR: ${error.message}`, false);
+                console.error('Error:', error);
+                addMessage(`ERROR: ${error.message || 'Unknown error'}`, false);
             }
             
-            currentFile = null;
             sendBtn.disabled = false;
+            sendBtn.textContent = 'SEND';
+            currentFile = null;
+            selectedFilePanel.style.display = 'none';
+            fileInput.value = '';
         }
-        
-        window.copyToClipboard = (text) => {
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Code copied to clipboard!');
-            });
-        };
-        
+
+        // Event listeners
         sendBtn.addEventListener('click', sendMessage);
+        
         userInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 sendMessage();
             }
         });
+
+        // Update time in initial message
+        document.querySelector('.message-time').textContent = new Date().toLocaleTimeString();
+
+        // Global error handler
+        window.onerror = function(msg, url, line) {
+            console.error('Global error:', msg, 'at', line);
+        };
     </script>
 </body>
-  </html>
+</html>
